@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\api\ProjetsController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -10,6 +11,8 @@ Route::get('/', function () {
 Route::get('/projets', function () {
     return view('projects');
 })->name('projets');
+Route::get('/projets/create', [ProjetsController::class, 'create'])->name('projets.create');
+Route::post('/projets', [ProjetsController::class, 'store'])->name('projets.store');
 
 Route::get('/taches', function () {
     return view('taches');

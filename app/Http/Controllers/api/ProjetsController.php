@@ -16,7 +16,7 @@ class ProjetsController extends Controller
     {
         // Récupérer tous les utilisateurs
         $utilisateurs = DB::table('users')->get();
-    
+
         // Vérifier si des utilisateurs existent
         if ($utilisateurs->isEmpty()) {
             return response()->json([
@@ -24,9 +24,9 @@ class ProjetsController extends Controller
                 'message' => 'Aucun utilisateur trouvé.',
             ], 404); // Aucun utilisateur trouvé
         }
-    
+
         $resultats = [];
-    
+
         // Pour chaque utilisateur, récupérer ses projets
         foreach ($utilisateurs as $utilisateur) {
             // Récupérer les projets de cet utilisateur et les trier par ordre alphabétique
@@ -34,7 +34,7 @@ class ProjetsController extends Controller
                          ->where('userp_id', $utilisateur->id) // Filtrer par ID utilisateur
                          ->orderBy('titre', 'asc') // Trier les projets par titre
                          ->get();
-    
+
             // Ajouter les informations de l'utilisateur et ses projets à la réponse
             $resultats[] = [
                 'utilisateur' => [
@@ -43,7 +43,7 @@ class ProjetsController extends Controller
                 'projets' => $projets,
             ];
         }
-    
+
         // Retourner les données utilisateur avec leurs projets associés
         return response()->json([
             'success' => true,
@@ -51,14 +51,14 @@ class ProjetsController extends Controller
             'data' => $resultats,
         ], 200); // Code HTTP 200 pour récupération réussie
     }
-    
+
 
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
-        //
+        return view('projects');
     }
 
     /**
@@ -67,58 +67,37 @@ class ProjetsController extends Controller
     public function store(Request $request)
     {
         // Validation des données du formulaire
+        $validatedData = $request->validate([
+            'titre' => 'required|string|max:255',
+            'description' => 'required|string',
+            'date_limite' => 'required|date|after:today',
+            'statut' => 'required|string|in:en cours,terminé,annulé',
+        ]);
+
         try {
-            $validatedData = $request->validate([
-                'titre' => 'required|string|max:255',
-                'description' => 'required|string',
-                'date_limite' => 'required|date|after:today',
-            ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation échouée.',
-                'errors' => $e->errors(),
-            ], 422); // Code HTTP 422 pour validation échouée
-        }
-    
-        // Récupérer l'utilisateur connecté
-        $userId = Auth::id();
-    
-        // Tentative d'insertion dans la base de données
-        try {
+            // Récupérer l'utilisateur connecté
+            $userId = Auth::id();
+
+            // Insertion des données dans la table 'projets'
             $projetId = DB::table('projets')->insertGetId([
                 'titre' => $validatedData['titre'],
                 'description' => $validatedData['description'],
                 'date_limite' => $validatedData['date_limite'],
-                'statut' => 'en cours', // Statut par défaut
+                'statut' => $validatedData['statut'],
                 'userp_id' => $userId,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-    
-            // Retourner la réponse JSON avec le projet créé
-            return response()->json([
-                'success' => true,
-                'message' => 'Projet créé avec succès.',
-                'data' => [
-                    'id' => $projetId,
-                    'titre' => $validatedData['titre'],
-                    'description' => $validatedData['description'],
-                    'date_limite' => $validatedData['date_limite'],
-                    'statut' => 'en cours',
-                    'userp_id' => $userId,
-                ],
-            ], 201); // Code HTTP 201 pour création réussie
+
+            // Retourner un message de succès à la même page avec les anciennes entrées
+            return back()->with('success', 'Projet créé avec succès!');
         } catch (\Exception $e) {
-            // En cas d'échec de l'insertion
-            return response()->json([
-                'success' => false,
-                'message' => 'Une erreur s\'est produite lors de la création du projet.',
-                'error' => $e->getMessage(),
-            ], 500); // Code HTTP 500 pour erreur serveur
+            // En cas d'erreur lors de l'insertion
+            return back()->with('error', 'Une erreur s\'est produite lors de la création du projet : ' . $e->getMessage());
         }
     }
-    
+
+
 
     /**
      * Display the specified resource.
@@ -158,13 +137,13 @@ class ProjetsController extends Controller
         $validatedData = $request->validate([
             'id' => 'required|integer|exists:projets,id', // ID obligatoire et doit exister dans la table projets
         ]);
-    
+
         // Récupérer l'ID du projet
         $projetId = $validatedData['id'];
-    
+
         // Récupérer les informations du projet
         $projet = DB::table('projets')->where('id', $projetId)->first();
-    
+
         // Vérifier si le projet existe (cette étape est redondante grâce à la validation)
         if (!$projet) {
             return response()->json([
@@ -172,7 +151,7 @@ class ProjetsController extends Controller
                 'message' => 'Projet non trouvé.',
             ], 404); // Code HTTP 404 si le projet est introuvable
         }
-    
+
         // Retourner les informations du projet
         return response()->json([
             'success' => true,
@@ -180,7 +159,7 @@ class ProjetsController extends Controller
             'data' => $projet,
         ], 200); // Code HTTP 200 pour succès
     }
-    
+
     public function updateStatut(Request $request)
     {
         // Validation des données du formulaire
@@ -226,11 +205,11 @@ class ProjetsController extends Controller
     {
         // Validation des données du formulaire
         $validatedData = $request->validate([
-            'id' => 'required|integer|exists:projets,id', 
+            'id' => 'required|integer|exists:projets,id',
             'titre' => 'required|string|max:255',
             'description' => 'required|string',
             'date_limite' => 'required|date|after:today',
-            'statut' => 'required|string|in:en cours,terminé', 
+            'statut' => 'required|string|in:en cours,terminé',
         ]);
 
         // Récupérer l'ID du projet à mettre à jour
@@ -295,20 +274,20 @@ class ProjetsController extends Controller
 {
     // Validation de l'ID du projet envoyé dans la requête
     $request->validate([
-        'projet_id' => 'required|integer|exists:projets,id', 
+        'projet_id' => 'required|integer|exists:projets,id',
     ]);
 
     $projetId = 'projet_id';
 
 
-    // Trouver le projet par ID 
+    // Trouver le projet par ID
     $projet = DB::table('projets')->where('id', $projetId)->first();
 
     if (!$projet) {
         return response()->json([
             'success' => false,
             'message' => 'Le projet avec cet ID n\'existe pas.',
-        ], 404); 
+        ], 404);
     }
 
 
@@ -330,5 +309,5 @@ class ProjetsController extends Controller
     }
 }
 
-    
+
 }

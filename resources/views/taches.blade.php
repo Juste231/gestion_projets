@@ -25,7 +25,7 @@
                             <label for="description" class="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-2">
                                 {{ __('Description') }}
                             </label>
-                            <textarea name="description" id="description" rows="4" class="w-full p-2 rounded border dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" required></textarea>
+                            <textarea name="description" id="description" rows="4" class="resize-none  w-full p-2 rounded border dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" required></textarea>
                         </div>
 
                         <!-- Statut -->
