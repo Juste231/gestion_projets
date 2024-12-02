@@ -56,98 +56,19 @@ class ProjetsController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        return view('projects');
-    }
+
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        // Validation des données du formulaire
-        try {
-            $validatedData = $request->validate([
-                'titre' => 'required|string|max:255',
-                'description' => 'required|string',
-                'date_limite' => 'required|date|after:today',
-                'userp_id' => 'required|string'
-            ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation échouée.',
-                'errors' => $e->errors(),
-            ], 422); // Code HTTP 422 pour validation échouée
-        }
 
-
-
-        // Tentative d'insertion dans la base de données
-        try {
-            $projetId = DB::table('projets')->insertGetId([
-                'titre' => $validatedData['titre'],
-                'description' => $validatedData['description'],
-                'date_limite' => $validatedData['date_limite'],
-                'statut' => 'en cours', // Statut par défaut
-                'userp_id' => $validatedData['userp_id'],
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-
-            // Retourner la réponse JSON avec le projet créé
-            return response()->json([
-                'success' => true,
-                'message' => 'Projet créé avec succès.',
-                'data' => [
-                    'id' => $projetId,
-                    'titre' => $validatedData['titre'],
-                    'description' => $validatedData['description'],
-                    'date_limite' => $validatedData['date_limite'],
-                    'statut' => 'en cours',
-                    'userp_id' => $validatedData['userp_id'],
-                ],
-            ], 201); // Code HTTP 201 pour création réussie
-        } catch (\Exception $e) {
-            // En cas d'échec de l'insertion
-            return response()->json([
-                'success' => false,
-                'message' => 'Une erreur s\'est produite lors de la création du projet.',
-                'error' => $e->getMessage(),
-            ], 500); // Code HTTP 500 pour erreur serveur
-        }
-    }
 
 
 
     /**
      * Display the specified resource.
      */
-    public function show()
-    {
-        // Récupère l'ID de l'utilisateur connecté
-        $userId = Auth::id();
 
-        // Requête pour récupérer les projets liés à cet utilisateur
-        $projets = DB::table('projets')
-            ->where('userp_id', $userId)
-            ->get();
-
-        // Si aucun projet n'est trouvé
-        if ($projets->isEmpty()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Aucun projet trouvé pour cet utilisateur.',
-            ], 404);
-        }
-
-        // Retourne les projets sous forme JSON
-        return response()->json([
-            'success' => true,
-            'data' => $projets,
-        ], 200);
-    }
 
 
     /**
@@ -292,44 +213,7 @@ class ProjetsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function delete(Request $request)
-{
-    // Validation de l'ID du projet envoyé dans la requête
-    $request->validate([
-        'projet_id' => 'required|integer|exists:projets,id',
-    ]);
 
-    $projetId = 'projet_id';
-
-
-    // Trouver le projet par ID
-    $projet = DB::table('projets')->where('id', $projetId)->first();
-
-    if (!$projet) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Le projet avec cet ID n\'existe pas.',
-        ], 404);
-    }
-
-
-
-    // Suppression du projet
-    try {
-        DB::table('projets')->where('id', $projetId)->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Projet supprimé avec succès.',
-        ], 200); // Projet supprimé avec succès
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Une erreur s\'est produite lors de la suppression du projet.',
-            'error' => $e->getMessage(),
-        ], 500); // Erreur serveur
-    }
-}
 
 
 }

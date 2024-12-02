@@ -17,7 +17,7 @@
                     </x-nav-link>
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('projets.create')" :active="request()->routeIs('projets.create')">
+                    <x-nav-link :href="route('projets.show')" :active="request()->routeIs('projets.show')">
                         {{ __('Mes Projets') }}
                     </x-nav-link>
                 </div>
