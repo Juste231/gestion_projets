@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\ProjetsController;
+use App\Http\Controllers\api\TachesController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -17,6 +18,8 @@ Route::post('/projets', [ProjetsController::class, 'store'])->name('projets.stor
 Route::get('/taches', function () {
     return view('taches');
 })->name('taches');
+Route::get('/taches/create', [TachesController::class, 'create'])->name('taches.create');
+Route::post('/taches', [TachesController::class, 'store'])->name('taches.store');
 
 Route::get('/dashboard', function () {
     return view('dashboard');

@@ -67,33 +67,55 @@ class ProjetsController extends Controller
     public function store(Request $request)
     {
         // Validation des données du formulaire
-        $validatedData = $request->validate([
-            'titre' => 'required|string|max:255',
-            'description' => 'required|string',
-            'date_limite' => 'required|date|after:today',
-            'statut' => 'required|string|in:en cours,terminé,annulé',
-        ]);
-
         try {
-            // Récupérer l'utilisateur connecté
-            $userId = Auth::id();
+            $validatedData = $request->validate([
+                'titre' => 'required|string|max:255',
+                'description' => 'required|string',
+                'date_limite' => 'required|date|after:today',
+                'userp_id' => 'required|string'
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation échouée.',
+                'errors' => $e->errors(),
+            ], 422); // Code HTTP 422 pour validation échouée
+        }
 
-            // Insertion des données dans la table 'projets'
+
+
+        // Tentative d'insertion dans la base de données
+        try {
             $projetId = DB::table('projets')->insertGetId([
                 'titre' => $validatedData['titre'],
                 'description' => $validatedData['description'],
                 'date_limite' => $validatedData['date_limite'],
-                'statut' => $validatedData['statut'],
-                'userp_id' => $userId,
+                'statut' => 'en cours', // Statut par défaut
+                'userp_id' => $validatedData['userp_id'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
 
-            // Retourner un message de succès à la même page avec les anciennes entrées
-            return back()->with('success', 'Projet créé avec succès!');
+            // Retourner la réponse JSON avec le projet créé
+            return response()->json([
+                'success' => true,
+                'message' => 'Projet créé avec succès.',
+                'data' => [
+                    'id' => $projetId,
+                    'titre' => $validatedData['titre'],
+                    'description' => $validatedData['description'],
+                    'date_limite' => $validatedData['date_limite'],
+                    'statut' => 'en cours',
+                    'userp_id' => $validatedData['userp_id'],
+                ],
+            ], 201); // Code HTTP 201 pour création réussie
         } catch (\Exception $e) {
-            // En cas d'erreur lors de l'insertion
-            return back()->with('error', 'Une erreur s\'est produite lors de la création du projet : ' . $e->getMessage());
+            // En cas d'échec de l'insertion
+            return response()->json([
+                'success' => false,
+                'message' => 'Une erreur s\'est produite lors de la création du projet.',
+                'error' => $e->getMessage(),
+            ], 500); // Code HTTP 500 pour erreur serveur
         }
     }
 
