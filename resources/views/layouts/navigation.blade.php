@@ -22,7 +22,7 @@
                     </x-nav-link>
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('taches.create')" :active="request()->routeIs('taches.create')">
+                    <x-nav-link :href="route('taches.show')" :active="request()->routeIs('taches.show')">
                         {{ __('Mes Tâches') }}
                     </x-nav-link>
                 </div>
@@ -83,13 +83,13 @@
         </div>
 
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('projects')">
+            <x-responsive-nav-link :href="route('projets.show')" :active="request()->routeIs('projets.show')">
                 {{ __('Mes Projets') }}
             </x-responsive-nav-link>
         </div>
 
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('tasks')">
+            <x-responsive-nav-link :href="route('taches.show')" :active="request()->routeIs('taches.show')">
                 {{ __('Mes Tâches') }}
             </x-responsive-nav-link>
         </div>

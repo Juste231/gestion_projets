@@ -21,7 +21,7 @@ class ProjetsController extends Controller
      */
     public function create()
     {
-        return view('projects');
+        return view('projets.projects');
     }
 
     /**
@@ -86,7 +86,7 @@ class ProjetsController extends Controller
         // Pagination avec les résultats filtrés
         $projets = $query->paginate(10);
     
-        return view('vuprojets', compact('projets'));
+        return view('projets.vuprojets', compact('projets'));
     }
     
     
@@ -113,7 +113,7 @@ class ProjetsController extends Controller
         }
     
         // Retourner la vue avec les informations du projet
-        return view('projetsedit', compact('projet'));
+        return view('projets.projetsedit', compact('projet'));
     }
     
 

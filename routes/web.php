@@ -24,6 +24,7 @@ Route::get('/projets/edit', [ProjetsController::class, 'edit'])->name('projets.e
 //Tache route
 Route::get('/taches/create', [TachesController::class, 'create'])->name('taches.create');
 Route::post('/taches', [TachesController::class, 'store'])->name('taches.store');
+Route::get('/taches/show', [TachesController::class, 'show'])->name('taches.show');
 
 
 
