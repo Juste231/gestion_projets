@@ -10,12 +10,14 @@ Route::get('/', function () {
 });
 
 
-// Projets route 
+// Projets route
 Route::get('/projets', function () {
     return view('projects');
 })->name('projets');
 Route::get('/projets/create', [ProjetsController::class, 'create'])->name('projets.create');
 Route::post('/projets', [ProjetsController::class, 'store'])->name('projets.store');
+Route::get('/projets', function () {return view('viewprojets');})->name('projets.show');
+Route::resource('projets', ProjetsController::class);
 
 
 
@@ -27,7 +29,7 @@ Route::post('/taches', [TachesController::class, 'store'])->name('taches.store')
 
 
 
-// breeze 
+// breeze
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');

@@ -15,10 +15,10 @@ Route::post('/login', [AuthController::class, 'login'])
 
 
 // Projets
-Route::get('/projets', [ProjetsController::class, 'index'])->name('projets.index');
+Route::get('/projets', [ProjetsController::class, 'index'])->name('projets.show');
 Route::get('/projets/user', [ProjetsController::class, 'show'])->name('projets.user');
 Route::post('/projets', [ProjetsController::class, 'store'])->name('projets.store');
 Route::post('/projets/edit', [ProjetsController::class, 'edit'])->name('projets.edit');
 Route::put('/projets', [ProjetsController::class, 'update'])->name('projets.update');
 Route::delete('/projets', [ProjetsController::class, 'destroy'])->name('projets.destroy');
-Route::patch('/projets/statut', [ProjetsController::class, 'updateStatut'])->name('projets.updatestatut'); 
+Route::patch('/projets/statut', [ProjetsController::class, 'updateStatut'])->name('projets.updatestatut');

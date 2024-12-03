@@ -13,7 +13,11 @@ class TachesController extends Controller
      */
     public function index()
     {
-        //
+        // Récupérer tous les projets depuis la base de données
+        $projets = DB::table('projets')->get();
+
+        // Passer les projets à la vue
+        return view('viewprojets', ['projets' => $projets]);
     }
 
     /**
@@ -24,14 +28,14 @@ class TachesController extends Controller
         // Récupérer la liste des projets et des utilisateurs
         $projets = DB::table('projets')->get(['id', 'titre']);
         $users = DB::table('users')->get(['id', 'name']);
-    
+
         // Retourner la vue avec les données
         return view('taches', [
             'projets' => $projets,
             'users' => $users,
         ]);
     }
-    
+
 
     /**
      * Store a newly created resource in storage.
@@ -46,13 +50,13 @@ class TachesController extends Controller
                 'projet_id' => 'required|integer|exists:projets,id',
                 'priorite' => 'required|string|in:faible,moyen,urgent',
             ]);
-    
+
             // Récupération de l'utilisateur connecté
             $userId = Auth::id();
-    
+
             // Si l'utilisateur assigné n'est pas défini, on l'assigne à l'utilisateur connecté
             $assigne_a = $request->input('assigne_a') ?? Auth::id();
-    
+
 
             //dd($assigne_a);
             // Création de la tâche dans la base de données
@@ -66,7 +70,7 @@ class TachesController extends Controller
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-    
+
             // Redirection vers la vue de création avec un message de succès
             return redirect()->route('taches.create')->with('success', 'Tâche créée avec succès.');
         } catch (\Exception $e) {
@@ -74,7 +78,7 @@ class TachesController extends Controller
             return redirect()->route('taches.create')->with('error', 'Erreur lors de la création de la tâche : ' . $e->getMessage());
         }
     }
-    
+
 
     /**
      * Display the specified resource.
