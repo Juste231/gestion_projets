@@ -1,4 +1,5 @@
 import './bootstrap';
+import SimpleDatatables from 'simple-datatables';
 
 import Alpine from 'alpinejs';
 

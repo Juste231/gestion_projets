@@ -25,12 +25,19 @@ class TachesController extends Controller
      */
     public function create()
     {
-        // Récupérer la liste des projets et des utilisateurs
-        $projets = DB::table('projets')->get(['id', 'titre']);
+        // Récupérer l'utilisateur connecté
+        $user = Auth::user();
+    
+        // Récupérer les projets créés par l'utilisateur connecté
+        $projets = DB::table('projets')
+                    ->where('userp_id', $user->id)  // Filtrer par l'ID de l'utilisateur qui a créé le projet
+                    ->get();
+    
+        // Récupérer la liste des utilisateurs (si nécessaire)
         $users = DB::table('users')->get(['id', 'name']);
 
         // Retourner la vue avec les données
-        return view('taches', [
+        return view('taches.taches', [
             'projets' => $projets,
             'users' => $users,
         ]);
@@ -83,10 +90,34 @@ class TachesController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request)
     {
-        //
+        $userId = Auth::id();
+    
+        // Récupération des tâches avec filtrage et pagination
+        $taches = DB::table('taches')
+        ->join('projets', 'taches.projet_id', '=', 'projets.id')
+        ->where(function ($query) use ($userId) {
+            $query->where('taches.assigne_a', $userId)
+                  ->orWhere('projets.userp_id', $userId);
+        })
+        ->when($request->filled('statut'), function ($query) use ($request) {
+            $query->where('taches.statut', $request->statut);
+        })
+        ->when($request->filled('priorite'), function ($query) use ($request) {
+            $query->where('taches.priorite', $request->priorite);
+        })
+        ->select(
+            'taches.*', 
+            'projets.titre as projet_titre' // Inclure le titre du projet
+        )
+        ->paginate(10);
+    
+    
+        return view('taches.vutaches', compact('taches'));
     }
+    
+    
 
     /**
      * Show the form for editing the specified resource.
